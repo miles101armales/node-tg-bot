@@ -1,7 +1,6 @@
 import { Markup, Telegraf } from 'telegraf';
 import { IBotContext } from '../context/context.interface';
 import { Command } from './command.class';
-import * as tt from '../../node_modules/telegraf/typings/telegram-types'
 
 export class StartCommand extends Command {
 	constructor(bot: Telegraf<IBotContext>) {
@@ -11,13 +10,28 @@ export class StartCommand extends Command {
 		try {
 			this.bot.start((ctx) => {
 				try {
-					ctx.reply(
-						`Добро пожаловать! Я бот-конвертер CSV-файлов в формат Google-таблиц.\nНа данный момент я умею:\n\n/convert - Конвертировать файлы в гугл таблицу\n/delete - Удалять вашу почту для доступа из базы данных\n/email - Устанавливать новую почту для доступа к Google-таблицам\n\n Выберите действие:`,
-						Markup.inlineKeyboard([
-							Markup.button.callback('Конвертировать', 'convert'),
-							Markup.button.callback('Изменить почту', 'email'),
-							Markup.button.callback('Настройки', 'settings'),
-						]))
+					if(ctx.session.email) {
+						ctx.reply(
+							`❤️ Добро пожаловать! Я бот-конвертер CSV-файлов в формат Google-таблиц.\n\nСписок моих комманд доступен по кнопке "Меню"\n\n ⬇️ Выберите действие:`,
+							{
+								reply_markup: {
+									inline_keyboard: [
+										[ { text: '⚡ Конвертировать', callback_data: 'convert' }, { text: '🧷 Настройки выгрузки', callback_data: 'settings' } ],
+										[ { text: '📥 Изменить почту', callback_data: 'email' } ]
+									]
+								}
+							}
+						)
+					} else {
+						ctx.reply(`Кажется, вы у нас впервые! 😅\n\nВам необходимо закрепить почту для предоставления доступа к созданным таблицам. 😊\nНажмите на кнопку⬇️`, 
+						{
+							reply_markup: {
+								inline_keyboard: [
+									[ { text: '📥 Закрепить почту', callback_data: 'email' } ]
+								]
+							}
+						})
+					}
 				} catch (error) {
 					this.bot.launch();
 				}
