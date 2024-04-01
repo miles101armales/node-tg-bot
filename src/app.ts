@@ -1,7 +1,7 @@
 import { ConfigService } from './config/config.service';
 import 'reflect-metadata';
 import { IConfigService } from './config/config.interface';
-import { Telegraf } from 'telegraf';
+import { Context, Telegraf } from 'telegraf';
 import { IBotContext } from './context/context.interface';
 import { Command } from './commands/command.class';
 import { StartCommand } from './commands/start.command';
@@ -19,9 +19,9 @@ export class Bot {
 		private readonly configService: IConfigService,
 		private readonly loggerService: LoggerService
 		) {
-			this.bot = new Telegraf<IBotContext>(this.configService.get('TEST_TOKEN'));
+			this.bot = new Telegraf<IBotContext>(this.configService.get('TOKEN_BOT_CSV'));
 			this.bot.use(
-				new LocalSession({ database: 'sessions1.json'})
+				new LocalSession({ database: 'sessions.json'})
 				.middleware()
 			);
 			// this.loggerService = new LoggerService()
@@ -41,8 +41,22 @@ export class Bot {
 		this.bot.launch();
 		this.loggerService.log(`Bot started on ${this.configService.get('TEST_TOKEN')}`);
 	}
+
+	restartBot() {
+		// Закрываем текущий экземпляр бота
+		this.bot.stop();
+		// Запускаем новый экземпляр бота
+		const bot = new Bot(new ConfigService(), new LoggerService);
+		bot.init();
+	}
 }
 
 const bot = new Bot(new ConfigService(), new LoggerService);
 
 bot.init();
+
+bot.bot.catch((err: unknown, ctx: Context) => {
+    console.error(`Error in bot: ${err}`);
+    // Перезапуск бота
+    bot.restartBot();
+});

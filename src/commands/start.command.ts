@@ -16,8 +16,8 @@ export class StartCommand extends Command {
 							{
 								reply_markup: {
 									inline_keyboard: [
-										[ { text: '⚡ Конвертировать', callback_data: 'convert' }, { text: '🧷 Настройки выгрузки', callback_data: 'settings' } ],
-										[ { text: '📥 Изменить почту', callback_data: 'email' } ]
+										[ { text: '⚡ Конвертировать', callback_data: 'convert_inline' }, { text: '🧷 Настройки выгрузки', callback_data: 'settings_inline' } ],
+										[ { text: '📥 Изменить почту', callback_data: 'email_inline' } ]
 									]
 								}
 							}
@@ -27,7 +27,7 @@ export class StartCommand extends Command {
 						{
 							reply_markup: {
 								inline_keyboard: [
-									[ { text: '📥 Закрепить почту', callback_data: 'email' } ]
+									[ { text: '📥 Закрепить почту', callback_data: 'email_inline' } ]
 								]
 							}
 						})
