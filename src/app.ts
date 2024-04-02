@@ -21,7 +21,7 @@ export class Bot {
 		) {
 			this.bot = new Telegraf<IBotContext>(this.configService.get('TOKEN_BOT_CSV'));
 			this.bot.use(
-				new LocalSession({ database: 'sessions.json'})
+				new LocalSession({ database: 'sessions1.json'})
 				.middleware()
 			);
 			// this.loggerService = new LoggerService()
@@ -39,7 +39,7 @@ export class Bot {
 			this.loggerService.log(`Command is on handle ${command.constructor.name}`)
 		}
 		this.bot.launch();
-		this.loggerService.log(`Bot started on ${this.configService.get('TEST_TOKEN')}`);
+		this.loggerService.log(`Bot started on ${this.configService.get('TOKEN_BOT_CSV')}`);
 	}
 
 	restartBot() {
