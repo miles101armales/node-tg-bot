@@ -37,6 +37,7 @@ export class ConvertCommand extends Command {
 
 				this.bot.action('convert_to_new', (ctx) => {
 					ctx.session.convert_to = 'new';
+					ctx.reply('Отправьте файл для конвертации');
 					this.convertProcess(ctx);
 				})
 
