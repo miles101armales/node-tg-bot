@@ -9,6 +9,7 @@ export class GoogleApiService {
 	spreadsheetId: string = '';
 	spreadsheetUrl: string = '';
 	csvService: CsvService;
+	statusOfImport: boolean;
 
 	constructor() {
 		this.csvService = new CsvService();
@@ -108,12 +109,16 @@ export class GoogleApiService {
 
 			console.log('Данные успешно импортированы в Google Sheets:', response.data);
 			} else {
-				console.log('CSV DATA NO ARRAY')
+				this.statusOfImport = false;
 			}
 			
 		} catch (error) {
 			console.error('Произошла ошибка:', error);
 		}
+	}
+
+	deleteCsvFile(filePath: string) {
+
 	}
 	
 }
