@@ -29,7 +29,6 @@ export class AuthCommand extends Command {
 		ctx.reply('Введите почту')
 		this.bot.hears(/^[^\s@]+@gmail\.com$/, async (ctx) => {
 			const email = ctx.update.message.text;
-			if(this.validateEmail(email)) {
 				ctx.reply(`Ваш электронный адрес Google-почты: ${ctx.update.message.text}\n\nВсе верно?`, {
 					reply_markup: {
 						inline_keyboard: [
@@ -38,10 +37,6 @@ export class AuthCommand extends Command {
 					}
 				});
 				ctx.session.email = ctx.update.message.text;
-			} else {
-				ctx.reply('Похоже ваша почта неверного формата 🤨\n\nВведите почту вашего Gmail-аккаунта');
-				this.convertSettingEmail(ctx);
-			}
 		})
 
 		this.bot.action('apply_email', async (ctx) => {
