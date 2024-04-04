@@ -71,14 +71,27 @@ export class AuthCommand extends Command {
 
 		this.bot.action('exist_table', async (ctx) => {
 			ctx.session.convert_to = 'Существующая таблица';
-			ctx.editMessageText('Отправьте URL вашей таблицы');
+			ctx.editMessageText('Отправьте URL вашей таблицы вида: https://docs.google.com/spreadsheets/d/ВАШ ID/edit');
 			this.bot.hears(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)\/edit/, async (ctx) => {
 				const urlParts = ctx.update.message.text.split('/');
 				ctx.session.url = ctx.update.message.text;
 				const spreadsheetId = urlParts[urlParts.length - 2];
-				ctx.reply(`Ваш URL: https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`)
-				
-				this.convertSettings(ctx);
+				ctx.reply(`Ваш URL: https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`, {
+					reply_markup: {
+						inline_keyboard: [
+							[{ text: 'Потдвердить ✅', callback_data: 'apply_url' }, { text: 'Изменить ↩️', callback_data: 'restart_url' }]
+						]
+					}
+				})
+
+				this.bot.action('apply_url', async (ctx) => {
+					this.convertSettings(ctx);
+				})
+		
+				this.bot.action('restart_url', async (ctx) => {
+					this.convertSettingsTo(ctx);
+				})
+
 			})
 		}) 
 
