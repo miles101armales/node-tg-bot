@@ -94,7 +94,7 @@ export class CsvService {
 			});
 			
 		} catch (error) {
-			console.log('Error')
+			console.error(error)
 		}
 	};
 
@@ -233,7 +233,7 @@ export class CsvService {
 			});
 			
 		} catch (error) {
-			console.log('Error')
+			console.error(error)
 		}
 	};
 	

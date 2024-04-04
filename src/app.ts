@@ -19,7 +19,7 @@ export class Bot {
 		private readonly configService: IConfigService,
 		private readonly loggerService: LoggerService
 		) {
-			this.bot = new Telegraf<IBotContext>(this.configService.get('TOKEN_BOT_CSV'));
+			this.bot = new Telegraf<IBotContext>(this.configService.get('TEST_TOKEN'));
 			this.bot.use(
 				new LocalSession({ database: 'sessions1.json'})
 				.middleware()
@@ -40,7 +40,7 @@ export class Bot {
 			this.loggerService.log(`Command is on handle ${command.constructor.name}`)
 		}
 		this.bot.launch();
-		this.loggerService.log(`Bot started on ${this.configService.get('TOKEN_BOT_CSV')}`);
+		this.loggerService.log(`Bot started on ${this.configService.get('TEST_TOKEN')}`);
 	}
 
 	restartBot() {
@@ -57,6 +57,7 @@ const bot = new Bot(new ConfigService(), new LoggerService);
 bot.init();
 
 bot.bot.catch((err: unknown, ctx: Context) => {
+	ctx.reply('Ошибка! Будьте аккуратнее с желаниями...\n\nПерезапуск бота...')
     console.error(`Error in bot: ${err}`);
     // Перезапуск бота
     bot.restartBot();

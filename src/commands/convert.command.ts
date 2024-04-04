@@ -1,4 +1,4 @@
-import {  Markup, Telegraf } from 'telegraf';
+import { Telegraf } from 'telegraf';
 import { Command } from './command.class';
 import { IBotContext } from '../context/context.interface';
 import { GoogleApiService } from '../google-api/google-api.service';
@@ -12,6 +12,7 @@ export class ConvertCommand extends Command {
 	googleSheetService: GoogleApiService;
 	csvService: CsvService;
 	Bot: Bot;
+	canContinue: boolean = false;
 
 	constructor(bot: Telegraf<IBotContext>) {
 		super(bot);
@@ -22,17 +23,33 @@ export class ConvertCommand extends Command {
 	handle(): void {
 		this.bot.command('convert', (ctx) => {
 			if(ctx.session.email) {
-				ctx.reply(`Вы попали в меню конвертации.\nВаши настройки:\n\n` +  `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
-				`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
-				`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n` +` Выберите опцию:`, {
-					reply_markup: {
-						inline_keyboard: [
-							[ { text: '#️⃣ Начать выгрузку', callback_data: 'convert_start' } ],
-							[ { text: '🆕 Изменить настройки', callback_data: 'settings_inline' } ],
-							[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]
-						]
-					}
-				});
+				if(ctx.session.convert_to === 'Новая таблица') {
+					ctx.reply(`Вы попали в меню конвертации.\nВаши настройки:\n\n` +  `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
+					`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
+					`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n` +` Выберите опцию:`, {
+						reply_markup: {
+							inline_keyboard: [
+								[ { text: '#️⃣ Начать выгрузку', callback_data: 'convert_start' } ],
+								[ { text: '🆕 Изменить настройки', callback_data: 'settings_inline' } ],
+								[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]
+							]
+						}
+					});
+				} else {
+					ctx.reply(`Вы попали в меню конвертации.\nВаши настройки:\n\n` +  `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
+					`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
+					`#️⃣ Ваша таблица:\n→ ${ctx.session.url}\n`+
+					`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n` +` Выберите опцию:`, {
+						reply_markup: {
+							inline_keyboard: [
+								[ { text: '#️⃣ Начать выгрузку', callback_data: 'convert_start' } ],
+								[ { text: '🆕 Изменить настройки', callback_data: 'settings_inline' } ],
+								[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]
+							]
+						}
+					});
+				}
+				
 			} else {
 				ctx.reply(`Кажется, вы у нас впервые! 😅\n\nВам необходимо пройти небольшую регистрацию для корректной работы с нашим ботом. 😊\nНажмите на кнопку⬇️`, 
 						{
@@ -47,17 +64,33 @@ export class ConvertCommand extends Command {
 		});
 		this.bot.action('convert_inline', (ctx) => {
 			if(ctx.session.email) {
-				ctx.editMessageText(`Вы попали в меню конвертации.\nВаши настройки:\n\n` +  `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
-				`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
-				`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n` +` Выберите опцию:`, {
-					reply_markup: {
-						inline_keyboard: [
-							[ { text: '#️⃣ Начать выгрузку', callback_data: 'convert_start' } ],
-							[ { text: '🆕 Изменить настройки', callback_data: 'settings_inline' } ],
-							[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]
-						]
-					}
-				});
+				if(ctx.session.convert_to === 'Новая таблица') {
+					ctx.editMessageText(`Вы попали в меню конвертации.\nВаши настройки:\n\n` +  `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
+					`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
+					`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n` +` Выберите опцию:`, {
+						reply_markup: {
+							inline_keyboard: [
+								[ { text: '#️⃣ Начать выгрузку', callback_data: 'convert_start' } ],
+								[ { text: '🆕 Изменить настройки', callback_data: 'settings_inline' } ],
+								[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]
+							]
+						}
+					});
+				} else {
+					ctx.editMessageText(`Вы попали в меню конвертации.\nВаши настройки:\n\n` +  `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
+					`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
+					`#️⃣ Ваша таблица:\n→ ${ctx.session.url}\n`+
+					`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n` +` Выберите опцию:`, {
+						reply_markup: {
+							inline_keyboard: [
+								[ { text: '#️⃣ Начать выгрузку', callback_data: 'convert_start' } ],
+								[ { text: '🆕 Изменить настройки', callback_data: 'settings_inline' } ],
+								[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]
+							]
+						}
+					});
+				}
+				
 			} else {
 				ctx.reply(`Кажется, вы у нас впервые! 😅\n\nВам необходимо пройти небольшую регистрацию для корректной работы с нашим ботом. 😊\nНажмите на кнопку⬇️`, 
 						{
@@ -116,39 +149,55 @@ export class ConvertCommand extends Command {
 				const writer = fs.createWriteStream(filePath);
 				response.data.pipe(writer);
 				
-				// Обработка CSV файла
-				if (ctx.session.convert_type === 'users') {
-					await this.csvService.readCsvUser(fileName as string);
-				} else if (ctx.session.convert_type === 'orders') {
-
-					await this.csvService.readCsvOrder(fileName as string);
-				}
-				
 				// Обработчик события окончания записи файла
 				writer.on('finish', async () => {
-					ctx.telegram.deleteMessage(ctx.chat.id, (ctx_1.msg.message_id))
-					ctx.reply('Обработка файла ⌛')
+					// Обработка CSV файла
+					if (ctx.session.convert_type === 'users') {
+						await this.csvService.readCsvUser(fileName as string);
+					} else if (ctx.session.convert_type === 'orders') {
+						await this.csvService.readCsvOrder(fileName as string);
+					}
+					ctx.reply('Обработка файла ⌛');
+					await ctx.telegram.deleteMessage(ctx.chat.id, ctx.msg.message_id - 1);
 
 					if(this.csvService.realArrOfObjects) {
-						await this.googleSheetService.handleNewRequest(fileName as string, ctx.session.email, ctx.chat.id, this.csvService.realArrOfObjects)
+						if(ctx.session.convert_to === 'Новая таблица') {
+							this.canContinue = true;
+							await this.googleSheetService.handleNewTable(fileName as string, ctx.session.email, ctx.chat.id, this.csvService.realArrOfObjects);
+						} else {
+							ctx.session.url_list = ctx.session.url;
+							ctx.telegram.deleteMessage(ctx.chat.id, ctx.msg.message_id + 1);
+							ctx.reply('Введите название нового листа')
+							this.bot.hears(/.*?/, async (ctx) => {
+								const spreadTitle = ctx.update.message.text;
+								await this.googleSheetService.handleExistTable(ctx.session.url, spreadTitle, this.csvService.realArrOfObjects);
+								await ctx.telegram.sendMessage(ctx.chat.id,  `Ваша таблица: ${ctx.session.url}`, {
+									reply_markup: {
+										inline_keyboard: [
+											[{ text: 'Вернуться в главное меню', callback_data: 'start' }]
+										]
+									}
+								})
+							})
+						}
 
 						this.filesCount--; // Уменьшаем счетчик при завершении обработки файла
-
-						// Если все файлы были обработаны, отправляем сообщение
-						if (this.filesCount === 0) {
-							ctx.session.url_list = this.googleSheetService.spreadsheetUrl;
-							this.csvService.deleteCsvFile(filePath);
-							ctx.telegram.deleteMessage(ctx.chat.id, (ctx.msg.message_id + 1))
+					}
+					// Если все файлы были обработаны, отправляем сообщение
+						if (this.canContinue == true) {
+							await this.csvService.deleteCsvFile(filePath);
 							if(this.googleSheetService.statusOfImport === false) {
 								ctx.reply('Что-то пошло не так 🤨\n\nПопробуйте еще раз 🙏 Проверьте какой тип выгрузки вы выбираете для файла.')
 							} else {
-								ctx.deleteMessage(ctx_1.message?.message_id);
-								this.bot.telegram.sendMessage(ctx.chat.id, `Ваша таблица: ${ctx.session.url_list}`, Markup.inlineKeyboard([
-									Markup.button.callback('Вернуться в главное меню', 'start'),
-								]))
+									ctx.telegram.editMessageText(ctx.chat.id, ctx.msg.message_id + 1, undefined,  `Ваша таблица: ${ctx.session.url_list}`, {
+										reply_markup: {
+											inline_keyboard: [
+												[{ text: 'Вернуться в главное меню', callback_data: 'start' }]
+											]
+										}
+									})
 							}
 						}
-					}
 				});
 
 				// Обработчик ошибок при записи файла
@@ -159,8 +208,10 @@ export class ConvertCommand extends Command {
 					this.filesCount--; // Уменьшаем счетчик при ошибке загрузки файла
 				});
 			} catch (err) {
-				ctx.reply('Для конвертации используйте метод /convert')
-				this.Bot.restartBot();
+				console.error('Произошла ошибка при обработке файла:', err);
+				ctx.reply('Произошла ошибка при обработке файла. Пожалуйста, попробуйте еще раз.');
+
+				this.filesCount--; // Уменьшаем счетчик при ошибке обработки файла
 			}
 		});
 	}

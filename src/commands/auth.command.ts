@@ -22,11 +22,12 @@ export class AuthCommand extends Command {
 
 	convertSettingEmail(ctx: IBotContext) {
 		ctx.session.email = '';
+		ctx.session.url = '';
 		ctx.session.convert_to = '';
 		ctx.session.convert_type = '';
 		ctx.session.convert_settings = '';
 		ctx.reply('Введите почту')
-		this.bot.hears(/.*?/, async (ctx) => {
+		this.bot.hears(/^[^\s@]+@gmail\.com$/, async (ctx) => {
 			const email = ctx.update.message.text;
 			if(this.validateEmail(email)) {
 				ctx.reply(`Ваш электронный адрес Google-почты: ${ctx.update.message.text}\n\nВсе верно?`, {
@@ -58,6 +59,7 @@ export class AuthCommand extends Command {
 			reply_markup: {
 				inline_keyboard: [
 					[{ text: 'Новая таблица', callback_data: 'new_table'}],
+					[{ text: 'Моя таблица(добавить)', callback_data: 'exist_table'}],
 				]
 			}
 		})
@@ -66,11 +68,25 @@ export class AuthCommand extends Command {
 			ctx.session.convert_to = 'Новая таблица';
 			this.convertSettings(ctx);
 		}) 
+
+		this.bot.action('exist_table', async (ctx) => {
+			ctx.session.convert_to = 'Существующая таблица';
+			ctx.editMessageText('Отправьте URL вашей таблицы');
+			this.bot.hears(/https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)\/edit/, async (ctx) => {
+				const urlParts = ctx.update.message.text.split('/');
+				ctx.session.url = ctx.update.message.text;
+				const spreadsheetId = urlParts[urlParts.length - 2];
+				ctx.reply(`Ваш URL: https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`)
+				
+				this.convertSettings(ctx);
+			})
+		}) 
+
 	}
 
 	convertSettings(ctx: IBotContext) {
 		this.checkSettings(ctx);
-		ctx.editMessageText(`${this.settings}Какую выборку необходимо применить к выгрузке?`, {
+		ctx.reply(`${this.settings}Какую выборку необходимо применить к выгрузке?`, {
 			reply_markup: {
 				inline_keyboard: [
 					[{ text: 'Безопасная', callback_data: 'safe'}],
@@ -112,8 +128,15 @@ export class AuthCommand extends Command {
     }
 
 	checkSettings(ctx: IBotContext) {
-		this.settings = `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
+		if(ctx.session.convert_to === 'Новая таблица') {
+			this.settings = `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
 		`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
 		`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n`;
+		} else if(ctx.session.url !== '') {
+			this.settings = `📥 Ваша почта:\n→ ${ctx.session.email}\n`+
+		`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
+		`#️⃣ Ваша таблица:\n→ ${ctx.session.url}\n`+
+		`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n`;
+		}
 	}
 }

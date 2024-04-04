@@ -1,15 +1,23 @@
 import * as fs from 'fs';
 import { ICredentials } from './credentials.interface';
-import { google } from 'googleapis'
+import { google, sheets_v4 } from 'googleapis'
 import { OAuth2Client } from 'google-auth-library';
 import { CsvService } from '../csv/csv.service';
+import { ConvertCommand } from '../commands/convert.command';
+import { config } from 'dotenv';
+import { ConfigService } from '../config/config.service';
+import { Telegraf } from 'telegraf';
+import { IBotContext } from '../context/context.interface';
+import { IConfigService } from '../config/config.interface';
 
 export class GoogleApiService {
 	client: OAuth2Client = new OAuth2Client;
 	spreadsheetId: string = '';
+	sheetTitle: string = '';
 	spreadsheetUrl: string = '';
 	csvService: CsvService;
-	statusOfImport: boolean;
+	public statusOfImport: boolean = true;
+	public canContinue: boolean = false;
 
 	constructor() {
 		this.csvService = new CsvService();
@@ -41,7 +49,7 @@ export class GoogleApiService {
 		}
 	}
 	//Метод проверки нового запроса на запись в таблицу
-	async handleNewRequest(fileName: string, mail: string, chatId: number, csvData: any[]): Promise<void> {
+	async handleNewTable(fileName: string, mail: string, chatId: number, csvData: any[]): Promise<void> {
 		await this.createTable(this.client, fileName, mail, chatId);
 		// Импортировать CSV в Google Sheets
 		await this.importCSVtoGoogleSheets(this.spreadsheetId, csvData);
@@ -57,7 +65,7 @@ export class GoogleApiService {
 		const sheets = google.sheets({ version: 'v4', auth: client });
 		const currentData = new Date();
 		const spreadTitle = `${currentData.toLocaleString()}`;
-		const sheetTitle = `Sheet1`;
+		this.sheetTitle = fileName;
 		// Запрос на создание новой таблицы
 		const response = await sheets.spreadsheets.create({
 			requestBody: {
@@ -67,7 +75,7 @@ export class GoogleApiService {
 				sheets: [
 					{
 						properties: {
-							title: sheetTitle,
+							title: this.sheetTitle,
 						},
 					},
 				],
@@ -89,7 +97,7 @@ export class GoogleApiService {
 		console.log('Доступ к таблице успешно предоставлен.');
 		this.spreadsheetId = spreadsheetId as string;
 		} catch (error) {
-			throw new Error('Ошибка создания таблицы')
+			console.error('Произошла ошибка:', error);
 		}
 	}
 	//импорт csv в таблицу
@@ -100,7 +108,7 @@ export class GoogleApiService {
 				const csvContent = JSON.parse(JSON.stringify(csvData));
 				const response = await sheets.spreadsheets.values.append({
 				spreadsheetId: spreadsheetId, // ID вашего Google Sheets документа
-				range: 'Sheet1', // Лист и диапазон, куда вы хотите импортировать данные
+				range: this.sheetTitle, // Лист и диапазон, куда вы хотите импортировать данные
 				valueInputOption: 'RAW',
 				requestBody: {
 					values: csvContent.map((row: any) => Object.values(row)),
@@ -108,17 +116,51 @@ export class GoogleApiService {
 			});
 
 			console.log('Данные успешно импортированы в Google Sheets:', response.data);
+			this.canContinue = true;
 			} else {
 				this.statusOfImport = false;
 			}
 			
+			spreadsheetId = '';
 		} catch (error) {
 			console.error('Произошла ошибка:', error);
 		}
 	}
 
-	deleteCsvFile(filePath: string) {
+	// добавляем лист и записываем в него данные
+	async handleExistTable(spreadsheetUrl: string, sheetTitle: string, csvData: any[]) {
+		try {
+			// Разбираем URL таблицы, чтобы получить идентификатор таблицы
+			const urlParts = spreadsheetUrl.split('/');
+			const spreadsheetId = urlParts[urlParts.length - 2];
+	
+			this.sheetTitle = sheetTitle
 
+			const sheets = google.sheets({ version: 'v4', auth: this.client });
+	
+			// Определение операции добавления листа
+			const request = {
+				spreadsheetId: spreadsheetId,
+				requestBody: {
+					requests: [
+						{
+							addSheet: {
+								properties: {
+									title: this.sheetTitle,
+								},
+							},
+						},
+					],
+				},
+			};
+	
+			// Выполняем запрос на добавление листа
+			const response = await sheets.spreadsheets.batchUpdate(request);
+			console.log('Лист успешно добавлен:', response.data);
+			await this.importCSVtoGoogleSheets(spreadsheetId, csvData)
+		} catch (error) {
+			console.error('Произошла ошибка при добавлении листа:', error);
+		}
 	}
 	
 }

@@ -1,32 +1,14 @@
 {
   "sessions": [
     {
-      "id": "408675754:408675754",
-      "data": {
-        "email": "ghaliev@gmail.com",
-        "convert_to": "Новая_таблица",
-        "convert_type": "orders",
-        "convert_settings": "Безопасная"
-      }
-    },
-    {
       "id": "416018817:416018817",
       "data": {
         "email": "armansk8er@gmail.com",
-        "convert_to": "Новая таблица",
+        "url": "https://docs.google.com/spreadsheets/d/1wj6s_-CRfjMqsuAsw044_VEv5R0DuLavpaRYB5NrNMg/edit",
+        "convert_to": "Существующая таблица",
         "convert_type": "users",
         "convert_settings": "Безопасная",
-        "url_list": "\nПо пользователям выгрузка.csv: https://docs.google.com/spreadsheets/d/1GphAy9s4G3lFUt4Lc47qoz2W4FPVE7ihhu9qYYO6m08/edit"
-      }
-    },
-    {
-      "id": "1810423951:1810423951",
-      "data": {
-        "email": "armansk8er@gmail.com",
-        "convert_to": "Новая_таблица",
-        "convert_type": "users",
-        "convert_settings": "Безопасная",
-        "url_list": "\nПо пользователям выгрузка.csv: https://docs.google.com/spreadsheets/d/1eqEvQR8BoBm41-4EflHdHIEqxqr8zUY-9G-CyJ9pdGo/edit"
+        "url_list": "https://docs.google.com/spreadsheets/d/1wj6s_-CRfjMqsuAsw044_VEv5R0DuLavpaRYB5NrNMg/edit"
       }
     }
   ]

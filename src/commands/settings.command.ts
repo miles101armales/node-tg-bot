@@ -10,7 +10,8 @@ export class SettingsCommand extends Command {
 	handle(): void {
 		this.bot.command('settings', (ctx) => {
 			if(ctx.session.email) {
-				ctx.reply(`Ваши настройки:\n\n`+
+				if(ctx.session.convert_to === 'Новая таблица') {
+					ctx.reply(`Ваши настройки:\n\n`+
 				`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
 				`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n`+
 				`Изменить настройку выгрузки?`, {
@@ -18,6 +19,18 @@ export class SettingsCommand extends Command {
 						inline_keyboard: [[ { text: 'Изменить', callback_data: 'apply_email' } ],[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]]
 					}
 				});
+				} else {
+					ctx.reply(`Ваши настройки:\n\n`+
+					`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
+					`#️⃣ Ваша таблица:\n→ ${ctx.session.url}\n`+
+					`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n`+
+					`Изменить настройку выгрузки?`, {
+						reply_markup: {
+							inline_keyboard: [[ { text: 'Изменить', callback_data: 'apply_email' } ],[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]]
+						}
+					});
+				}
+				
 			} else {
 				ctx.reply(`Кажется, вы у нас впервые! 😅\n\nВам необходимо пройти небольшую регистрацию для корректной работы с нашим ботом. 😊\nНажмите на кнопку⬇️`, 
 						{
@@ -31,15 +44,27 @@ export class SettingsCommand extends Command {
 		});
 		this.bot.action('settings_inline', (ctx) => {
 			if(ctx.session.email) {
-				ctx.editMessageText(`Ваши настройки:\n\n`+
+				if(ctx.session.convert_to === 'Новая таблица') {
+					ctx.editMessageText(`Ваши настройки:\n\n`+
 				`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
 				`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n`+
 				`Изменить настройку выгрузки?`, {
 					reply_markup: {
-						inline_keyboard: [[ { text: 'Изменить', callback_data: 'apply_email' } ],
-						[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]]
+						inline_keyboard: [[ { text: 'Изменить', callback_data: 'apply_email' } ],[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]]
 					}
 				});
+				} else {
+					ctx.editMessageText(`Ваши настройки:\n\n`+
+					`#️⃣ Конвертация в таблицу:\n→ ${ctx.session.convert_to}\n`+
+					`#️⃣ Ваша таблица:\n→ ${ctx.session.url}\n`+
+					`#️⃣ Выборка выгрузки:\n→ ${ctx.session.convert_settings}\n\n`+
+					`Изменить настройку выгрузки?`, {
+						reply_markup: {
+							inline_keyboard: [[ { text: 'Изменить', callback_data: 'apply_email' } ],[ { text: '↩️ Вернуться в главное меню', callback_data: 'start_back' } ]]
+						}
+					});
+				}
+				
 			} else {
 				ctx.reply(`Кажется, вы у нас впервые! 😅\n\nВам необходимо пройти небольшую регистрацию для корректной работы с нашим ботом. 😊\nНажмите на кнопку⬇️`, 
 						{
